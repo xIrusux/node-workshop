@@ -1,19 +1,20 @@
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
 
 // var message = 'I am so happy to be part of the Node Girls workshop!';
-
-function handler (request, response) {
-    var endpoint = request.url;
+const handler = (request, response) => {
+    const endpoint = request.url;
     console.log(endpoint);
 
-    var method = request.method;
+    const method = request.method;
     console.log(method);
 
     if (endpoint === "/") {
         response.writeHead(200, {"Content-Type": "text/html"});
 
-        fs.readFile(__dirname + '/public/index.html', function(error, file) {
+        fs.readFile(__dirname + '/public/index.html', function (error, file) {
             if (error) {
                 console.log(error);
                 return;
@@ -30,9 +31,35 @@ function handler (request, response) {
         response.write("node girls just wanna have fun");
         response.end();
     } else {
-        response.writeHead(404, { 'Content-Type': 'text/html' });
-        response.end('<h1>404 file not found</h1>');
-     }
+        console.log("inside");
+        const extension = endpoint.split('.')[1];
+        console.log("here extension", extension);
+        const extensionType = {
+            html: 'text/html',
+            css: 'text/css',
+            js: 'application/javascript',
+            ico: 'image/x-icon',
+            jpg: "image/jpeg",
+        };
+        const filePath = path.join(__dirname + '/public/' + endpoint);
+        console.log("filepath",filePath);
+        console.log("content",extensionType[extension]);
+        fs.readFile(filePath, (error, file) => {
+                if (error) {
+                    console.log(error);
+                    response.writeHead(404, {'Content-Type': 'text/html'});
+                    response.end('<h1>404 file not found</h1>');
+                } else {
+                    response.writeHead(200, {'Content-Type': extensionType[extension]});
+                    response.end(file);
+                }
+            }
+        );
+}
+// else {
+//         response.writeHead(404, { 'Content-Type': 'text/html' });
+//         response.end('<h1>404 file not found</h1>');
+//      }
 }
 
 var server = http.createServer(handler);

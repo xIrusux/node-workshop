@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/xIrusux/node-workshop#readme",
   "dependencies": {
-    "fs": "0.0.1-security"
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
   }
 }
