@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const querystring = require('querystring');
 
 
 // var message = 'I am so happy to be part of the Node Girls workshop!';
@@ -26,14 +27,26 @@ const handler = (request, response) => {
         response.write("wow node time");
         response.end();
     } else if (endpoint === "/girls") {
-        //  console.log("node girls just wanna have fun");
         response.writeHead(200, {"Content-Type": "text/html"})
         response.write("node girls just wanna have fun");
         response.end();
+    } else if (endpoint === '/create-post') {
+
+        message = "";
+
+        request.on("data", function(data) {
+            message += data;
+        });
+
+        request.on("end", function () {
+            response.writeHead(302, {"Location": "/"});
+            message = querystring.parse(message);
+            console.log(message.blogpost);
+            response.end();
+        });
+
     } else {
-        console.log("inside");
         const extension = endpoint.split('.')[1];
-        console.log("here extension", extension);
         const extensionType = {
             html: 'text/html',
             css: 'text/css',
@@ -42,8 +55,6 @@ const handler = (request, response) => {
             jpg: "image/jpeg",
         };
         const filePath = path.join(__dirname + '/public/' + endpoint);
-        console.log("filepath",filePath);
-        console.log("content",extensionType[extension]);
         fs.readFile(filePath, (error, file) => {
                 if (error) {
                     console.log(error);
